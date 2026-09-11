@@ -1,14 +1,17 @@
-import dotenv from "dotenv";
-dotenv.config();
+import { createClient } from "redis";
 
-import IORedis from "ioredis";
-
-console.log("REDIS_HOST =", process.env.REDIS_HOST);
-
-const connection = new IORedis({
-  host: process.env.REDIS_HOST || "localhost",
-  port: 6379,
-  maxRetriesPerRequest: null,
+const redisClient = createClient({
+   url: "redis://:Ab1762919@127.0.0.1:6380",
 });
 
-export default connection;
+redisClient.on("error", (err) => {
+  console.error("Redis Client Error:", err);
+});
+
+export const subscriber = redisClient.duplicate();
+
+subscriber.on("error", (err) => {
+  console.error("Redis Subscriber Error:", err);
+});
+
+export default redisClient;
